@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 from PIL import Image
 
-from core.styling import inject_global_css, render_page_header, render_sidebar_brand
+from core.styling import inject_global_css, render_page_header, render_sidebar_brand, safe_switch_page
 from core.security import anonymize_id, mask_identifier, is_valid_rm_format, consent_gate
 from core.inference import (
     load_model, run_inference, get_diagnosis_class, get_referral_recommendation,
@@ -257,6 +257,9 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
         st.info("💡 Buka halaman **Rujukan Cerdas & Peta RS** di menu sidebar untuk melihat fasilitas & dokter terdekat sesuai kategori hasil ini.")
         if st.button("🗺️ Lihat Peta Rujukan Sesuai Hasil Ini", use_container_width=True):
             st.session_state["referral_filter_category"] = category
-            st.switch_page("pages/3_Smart_Referral_Map.py")
+            safe_switch_page(
+                "pages/3_Smart_Referral_Map.py",
+                fallback_message="Buka halaman 'Rujukan Cerdas & Peta RS' lewat menu navigasi di sidebar sebelah kiri atas.",
+            )
 
     st.markdown("</div>", unsafe_allow_html=True)
