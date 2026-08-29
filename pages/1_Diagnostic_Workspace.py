@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 from PIL import Image
 
-from core.styling import inject_global_css, render_page_header, render_sidebar_brand, safe_switch_page
+from core.styling import inject_global_css, render_page_header, render_sidebar_brand, safe_switch_page, safe_image
 from core.security import anonymize_id, mask_identifier, is_valid_rm_format, consent_gate
 from core.inference import (
     load_model, run_inference, get_diagnosis_class, get_referral_recommendation,
@@ -151,7 +151,7 @@ with col_workspace:
             unsafe_allow_html=True,
         )
     else:
-        st.image(st.session_state.input_image, use_container_width=True, caption="Citra Input — Belum Dianalisis")
+        safe_image(st.session_state.input_image, caption="Citra Input — Belum Dianalisis")
         can_run = consent_gate(consent) and is_valid_rm_format(rm_number) and model is not None
         run_scan = st.button("🚀 Jalankan Pemindaian AI", use_container_width=True, disabled=not can_run)
 
@@ -189,10 +189,10 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
     with tab_visual:
         col_a, col_b = st.columns(2, gap="medium")
         with col_a:
-            st.image(st.session_state.input_image, use_container_width=True)
+            safe_image(st.session_state.input_image)
             st.caption("Citra Asli (Original)")
         with col_b:
-            st.image(st.session_state.result_image, use_container_width=True)
+            safe_image(st.session_state.result_image)
             st.caption("Hasil Deteksi AI (Annotated)")
 
         st.markdown("<br>", unsafe_allow_html=True)
