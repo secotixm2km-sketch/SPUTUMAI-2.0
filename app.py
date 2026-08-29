@@ -22,7 +22,10 @@ inject_global_css()
 with st.sidebar:
     render_sidebar_brand()
     st.markdown('<div class="sidebar-section-label">Navigasi Platform</div>', unsafe_allow_html=True)
-    st.page_link("app.py", label="🏠 Beranda", icon=None)
+    # Catatan: tidak membuat page_link ke app.py itu sendiri (halaman utama yang
+    # sedang berjalan) karena beberapa versi Streamlit melempar KeyError saat
+    # sebuah skrip mereferensikan dirinya sendiri sebagai "page" terdaftar.
+    st.caption("🏠 Anda sedang berada di halaman Beranda")
     st.page_link("pages/1_Diagnostic_Workspace.py", label="🩺 Diagnostic Workspace")
     st.page_link("pages/2_Epidemiology_Dashboard.py", label="📊 Dashboard Epidemiologi")
     st.page_link("pages/3_Smart_Referral_Map.py", label="🗺️ Rujukan Cerdas & Peta RS")
