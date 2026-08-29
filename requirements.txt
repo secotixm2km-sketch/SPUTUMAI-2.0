@@ -1,0 +1,8 @@
+streamlit>=1.32
+ultralytics>=8.1
+pillow>=10.0
+fpdf2>=2.7
+pandas>=2.0
+plotly>=5.18
+folium>=0.15
+streamlit-folium>=0.18
