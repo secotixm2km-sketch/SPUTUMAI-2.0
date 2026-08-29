@@ -253,3 +253,34 @@ def render_stat_card(icon: str, value: str, label: str, delta: str = "", delta_d
         """,
         unsafe_allow_html=True,
     )
+
+
+def safe_page_link(page: str, label: str, use_container_width: bool = False, icon: str | None = None):
+    """
+    Wrapper aman untuk st.page_link().
+
+    Beberapa environment (kombinasi versi Streamlit + Python tertentu, mis. di
+    Streamlit Community Cloud) diketahui melempar KeyError internal pada
+    st.page_link() akibat bug pada page registry. Fungsi ini menangkap error
+    tersebut agar aplikasi TIDAK crash — jika link gagal dibuat, tampilkan
+    info fallback berupa teks biasa yang tetap memberi tahu pengguna ke mana
+    harus pergi (lewat menu navigasi otomatis di sidebar).
+    """
+    try:
+        if icon is not None:
+            st.page_link(page, label=label, use_container_width=use_container_width, icon=icon)
+        else:
+            st.page_link(page, label=label, use_container_width=use_container_width)
+    except Exception:
+        st.info(f"➡️ Buka **{label}** lewat menu navigasi di sidebar sebelah kiri atas.")
+
+
+def safe_switch_page(page: str, fallback_message: str = "Silakan buka halaman tujuan lewat menu navigasi di sidebar."):
+    """
+    Wrapper aman untuk st.switch_page(). Jika API ini gagal (bug versi
+    tertentu), tampilkan pesan fallback alih-alih membuat aplikasi crash.
+    """
+    try:
+        st.switch_page(page)
+    except Exception:
+        st.warning(fallback_message)
