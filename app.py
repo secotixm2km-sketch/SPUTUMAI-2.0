@@ -9,7 +9,7 @@ folder `pages/`).
 
 import streamlit as st
 
-from core.styling import inject_global_css, render_page_header, render_sidebar_brand
+from core.styling import inject_global_css, render_page_header, render_sidebar_brand, safe_page_link
 
 st.set_page_config(
     page_title="SputumAI Workspace | End-to-End TB Platform",
@@ -26,10 +26,10 @@ with st.sidebar:
     # sedang berjalan) karena beberapa versi Streamlit melempar KeyError saat
     # sebuah skrip mereferensikan dirinya sendiri sebagai "page" terdaftar.
     st.caption("🏠 Anda sedang berada di halaman Beranda")
-    st.page_link("pages/1_Diagnostic_Workspace.py", label="🩺 Diagnostic Workspace")
-    st.page_link("pages/2_Epidemiology_Dashboard.py", label="📊 Dashboard Epidemiologi")
-    st.page_link("pages/3_Smart_Referral_Map.py", label="🗺️ Rujukan Cerdas & Peta RS")
-    st.page_link("pages/4_Education_Center.py", label="📚 Pusat Edukasi TBC")
+    safe_page_link("pages/1_Diagnostic_Workspace.py", "🩺 Diagnostic Workspace")
+    safe_page_link("pages/2_Epidemiology_Dashboard.py", "📊 Dashboard Epidemiologi")
+    safe_page_link("pages/3_Smart_Referral_Map.py", "🗺️ Rujukan Cerdas & Peta RS")
+    safe_page_link("pages/4_Education_Center.py", "📚 Pusat Edukasi TBC")
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.caption("© 2026 SputumAI Workspace — Clinical Decision Support Platform. Bukan pengganti diagnosis dokter Sp.PK.")
@@ -102,7 +102,7 @@ for col, pillar in zip([col1, col2, col3, col4], pillar_cards):
             """,
             unsafe_allow_html=True,
         )
-        st.page_link(pillar["page"], label=pillar["cta"], use_container_width=True)
+        safe_page_link(pillar["page"], pillar["cta"], use_container_width=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
