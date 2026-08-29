@@ -284,3 +284,20 @@ def safe_switch_page(page: str, fallback_message: str = "Silakan buka halaman tu
         st.switch_page(page)
     except Exception:
         st.warning(fallback_message)
+
+
+def safe_image(image, caption: str | None = None):
+    """
+    Wrapper aman untuk st.image() yang menampilkan gambar selebar kolom,
+    kompatibel dengan berbagai versi Streamlit. Versi Streamlit yang lebih
+    baru mengganti parameter 'use_container_width' menjadi 'width=\"stretch\"',
+    sehingga fungsi ini mencoba beberapa kemungkinan API secara berurutan
+    agar tidak membuat aplikasi crash di versi manapun.
+    """
+    try:
+        st.image(image, use_container_width=True, caption=caption)
+    except TypeError:
+        try:
+            st.image(image, width="stretch", caption=caption)
+        except TypeError:
+            st.image(image, caption=caption)
