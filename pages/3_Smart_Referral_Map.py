@@ -43,8 +43,8 @@ with st.sidebar:
     selected_category = category_options[selected_label]
 
     facility_type_filter = st.multiselect(
-        "Jenis Fasilitas", ["Rumah Sakit", "Dokter", "Puskesmas"],
-        default=["Rumah Sakit", "Dokter", "Puskesmas"],
+        "Jenis Fasilitas", ["Rumah Sakit", "Klinik", "Puskesmas"],
+        default=["Rumah Sakit", "Klinik", "Puskesmas"],
     )
 
     if auto_category:
@@ -56,7 +56,7 @@ with st.sidebar:
 
 render_page_header(
     "Rujukan Cerdas & Peta Fasilitas TBC",
-    "Temukan Rumah Sakit rujukan dan Dokter Spesialis Paru/Sp.PK terdekat berdasarkan rekomendasi sistem AI.",
+    "Temukan Rumah Sakit rujukan, Klinik spesialis paru, dan Puskesmas terdekat berdasarkan rekomendasi sistem AI.",
     badges=["🩺 Rujukan Otomatis", "🗺️ Peta Interaktif", "📞 Kontak Cepat"],
     icon="🗺️",
 )
@@ -102,10 +102,15 @@ with col_map:
 
     fmap = folium.Map(location=[center_lat, center_lon], zoom_start=5 if facilities else 4.3, tiles="CartoDB positron")
 
-    type_icon_map = {"Rumah Sakit": ("hospital-o", "red"), "Dokter": ("user-md", "blue"), "Puskesmas": ("plus-square", "green")}
+    type_icon_map = {"Rumah Sakit": ("hospital-o", "red"), "Klinik": ("stethoscope", "blue"), "Puskesmas": ("plus-square", "green")}
 
     for f in facilities:
         icon_name, icon_color = type_icon_map.get(f["type"], ("info-sign", "gray"))
+        phone_html = (
+            f'<a href="tel:{f["phone"]}" style="display:inline-block;background:#e0f2fe;color:#0369a1;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">📞 {f["phone"]}</a>'
+            if f.get("phone")
+            else '<span style="font-size:11px;color:#94a3b8;">Nomor telepon belum tersedia — cari nama fasilitas ini di Google untuk info terkini.</span>'
+        )
         popup_html = f"""
         <div style="font-family:'Segoe UI',sans-serif; width:230px;">
             <div style="font-size:28px; text-align:center;">{f['photo']}</div>
@@ -114,8 +119,7 @@ with col_map:
             <div style="font-size:11.5px; color:#334155; line-height:1.5; margin-bottom:6px;">{f['bio']}</div>
             <div style="font-size:11px; color:#64748b; margin-bottom:2px;">📍 {f['address']}</div>
             <div style="font-size:11px; color:#64748b; margin-bottom:8px;">🕒 {f['hours']}</div>
-            <a href="tel:{f['phone']}" style="display:inline-block;background:#e0f2fe;color:#0369a1;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;margin-right:6px;">📞 Telepon</a>
-            <a href="https://wa.me/{f['whatsapp']}" target="_blank" style="display:inline-block;background:#dcfce7;color:#15803d;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">💬 WhatsApp</a>
+            {phone_html}
         </div>
         """
         folium.Marker(
@@ -138,6 +142,11 @@ with col_list:
         st.info("Tidak ada fasilitas yang cocok dengan filter saat ini.")
 
     for f in facilities:
+        phone_link = (
+            f'<a class="action-link action-call" href="tel:{f["phone"]}">📞 {f["phone"]}</a>'
+            if f.get("phone")
+            else '<span style="font-size:11.5px;color:#94a3b8;">Nomor telepon belum tersedia</span>'
+        )
         st.markdown(
             f"""
             <div class="referral-card">
@@ -149,8 +158,7 @@ with col_list:
                         📍 {f['address']}<br>
                         🕒 {f['hours']}
                     </div>
-                    <a class="action-link action-call" href="tel:{f['phone']}">📞 Telepon</a>
-                    <a class="action-link action-wa" href="https://wa.me/{f['whatsapp']}" target="_blank">💬 WhatsApp</a>
+                    {phone_link}
                 </div>
             </div>
             """,
