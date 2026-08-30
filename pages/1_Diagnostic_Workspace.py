@@ -16,7 +16,7 @@ from core.styling import inject_global_css, render_page_header, render_sidebar_b
 from core.security import anonymize_id, mask_identifier, is_valid_rm_format, consent_gate
 from core.inference import (
     load_model, run_inference, get_diagnosis_class, get_referral_recommendation,
-    ULTRALYTICS_AVAILABLE, MODEL_PATH,
+    ULTRALYTICS_AVAILABLE, ULTRALYTICS_IMPORT_ERROR, MODEL_PATH,
 )
 from core.pdf_report import generate_pdf_report
 
@@ -129,6 +129,8 @@ with col_input:
 
     if not ULTRALYTICS_AVAILABLE:
         st.warning("⚠️ Modul `ultralytics` belum terpasang di environment ini.")
+        if ULTRALYTICS_IMPORT_ERROR:
+            st.code(ULTRALYTICS_IMPORT_ERROR, language="text")
     elif model is None:
         st.warning(f"⚠️ Model `{MODEL_PATH}` tidak ditemukan di direktori aplikasi.")
     if not rm_number or not is_valid_rm_format(rm_number):
