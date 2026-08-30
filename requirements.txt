@@ -1,4 +1,5 @@
 streamlit==1.38.0
+numpy<2.0
 ultralytics>=8.1
 pillow>=10.0
 fpdf2>=2.7
