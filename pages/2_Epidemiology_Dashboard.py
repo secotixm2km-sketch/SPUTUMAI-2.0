@@ -87,19 +87,32 @@ with col_map:
     st.markdown('<div class="card-subtitle">Ukuran & warna titik merepresentasikan tingkat prevalensi dan zona risiko</div>', unsafe_allow_html=True)
 
     zone_color_map = {"merah": "#ef4444", "kuning": "#f59e0b", "hijau": "#22c55e"}
-    fig_map = px.scatter_mapbox(
-        df, lat="lat", lon="lon", size="prevalensi_per_100k", color="zona",
+    common_map_kwargs = dict(
+        lat="lat", lon="lon", size="prevalensi_per_100k", color="zona",
         color_discrete_map=zone_color_map,
         hover_name="provinsi",
         hover_data={"lat": False, "lon": False, "prevalensi_per_100k": True, "angka_kesembuhan": True, "zona": True},
         size_max=38, zoom=3.6, height=430,
     )
-    fig_map.update_layout(
-        mapbox_style="carto-positron",
-        margin=dict(l=0, r=0, t=0, b=0),
-        legend=dict(title="Zona Risiko", orientation="h", yanchor="bottom", y=0.01, x=0.01),
-        paper_bgcolor="#ffffff",
-    )
+    try:
+        # Plotly versi 6+ mengganti scatter_mapbox (berbasis Mapbox) menjadi
+        # scatter_map (berbasis MapLibre bawaan Plotly, tidak butuh token Mapbox).
+        fig_map = px.scatter_map(df, **common_map_kwargs)
+        fig_map.update_layout(
+            map_style="carto-positron",
+            margin=dict(l=0, r=0, t=0, b=0),
+            legend=dict(title="Zona Risiko", orientation="h", yanchor="bottom", y=0.01, x=0.01),
+            paper_bgcolor="#ffffff",
+        )
+    except AttributeError:
+        # Fallback untuk versi Plotly lama (<6) yang masih memakai scatter_mapbox.
+        fig_map = px.scatter_mapbox(df, **common_map_kwargs)
+        fig_map.update_layout(
+            mapbox_style="carto-positron",
+            margin=dict(l=0, r=0, t=0, b=0),
+            legend=dict(title="Zona Risiko", orientation="h", yanchor="bottom", y=0.01, x=0.01),
+            paper_bgcolor="#ffffff",
+        )
     st.plotly_chart(fig_map, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
