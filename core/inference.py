@@ -11,8 +11,14 @@ from PIL import Image
 try:
     from ultralytics import YOLO
     ULTRALYTICS_AVAILABLE = True
-except ImportError:
+    ULTRALYTICS_IMPORT_ERROR = None
+except Exception as e:
+    # Menangkap SEMUA jenis error saat import (bukan cuma ImportError), lalu
+    # menyimpan pesan aslinya di ULTRALYTICS_IMPORT_ERROR supaya bisa
+    # ditampilkan di UI untuk membantu diagnosis penyebab pasti kegagalan
+    # (mis. konflik versi numpy, library sistem hilang, dsb).
     ULTRALYTICS_AVAILABLE = False
+    ULTRALYTICS_IMPORT_ERROR = f"{type(e).__name__}: {e}"
 
 MODEL_PATH = "best.pt"
 
