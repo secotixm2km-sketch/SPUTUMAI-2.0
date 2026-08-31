@@ -114,22 +114,50 @@ with col_input:
     st.markdown('<div class="card-title">📥 Sumber Citra</div>', unsafe_allow_html=True)
     st.markdown('<div class="card-subtitle">Pilih metode input citra sediaan dahak mikroskopis</div>', unsafe_allow_html=True)
 
+    # BARIS INI YANG TADI KEMUNGKINAN IKUT TERHAPUS:
     input_mode = st.radio("Metode Input", ["Unggah File (Drag & Drop)", "Kamera Mikroskop"], label_visibility="collapsed")
 
-    uploaded_image = None
+    raw_file = None
     if input_mode == "Unggah File (Drag & Drop)":
-        uploaded_file = st.file_uploader("Seret & lepas citra di sini, atau klik untuk memilih file", type=["jpg", "jpeg", "png"])
-        if uploaded_file is not None:
-            uploaded_image = Image.open(uploaded_file).convert("RGB")
+        # Tambahkan parameter key="unique_uploader_key" di sini
+        raw_file = st.file_uploader(
+            "Seret & lepas citra di sini, atau klik untuk memilih file", 
+            type=["jpg", "jpeg", "png"], 
+            key="unique_uploader_key"
+        )
     else:
-        camera_file = st.camera_input("Ambil citra langsung dari kamera mikroskop")
-        if camera_file is not None:
-            uploaded_image = Image.open(camera_file).convert("RGB")
+        raw_file = st.camera_input("Ambil citra langsung dari kamera mikroskop")
 
-    if uploaded_image is not None:
-        st.session_state.input_image = uploaded_image
+    if raw_file is not None:
+        current_bytes = raw_file.getvalue()
+        # Bandingkan bytes agar Streamlit tahu ini gambar baru atau bukan
+        if ("image_bytes" not in st.session_state) or (st.session_state.image_bytes != current_bytes):
+            st.session_state.image_bytes = current_bytes
+            st.session_state.input_image = Image.open(raw_file).convert("RGB")
+            st.session_state.scan_done = False
+            st.session_state.result_image = None
+            
+    st.markdown("</div>", unsafe_allow_html=True)
+
+ # --- INISIALISASI SESSION STATE (Taruh di atas) ---
+    if "scan_done" not in st.session_state:
         st.session_state.scan_done = False
 
+    if "result_image" not in st.session_state:
+        st.session_state.result_image = None
+
+    if "bta_count" not in st.session_state:
+        st.session_state.bta_count = 0
+
+    if "avg_confidence" not in st.session_state:
+        st.session_state.avg_confidence = 0.0
+
+    if "input_image" not in st.session_state:
+        st.session_state.input_image = None
+
+    if "image_bytes" not in st.session_state:
+        st.session_state.image_bytes = None
+# --------------------------------------------------
     st.markdown("</div>", unsafe_allow_html=True)
 
     if not ULTRALYTICS_AVAILABLE:
