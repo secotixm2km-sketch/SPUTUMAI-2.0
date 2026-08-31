@@ -16,7 +16,7 @@ from core.styling import inject_global_css, render_page_header, render_sidebar_b
 from core.security import anonymize_id, mask_identifier, is_valid_rm_format, consent_gate
 from core.inference import (
     load_model, run_inference, get_diagnosis_class, get_referral_recommendation,
-    ULTRALYTICS_AVAILABLE, ULTRALYTICS_IMPORT_ERROR, MODEL_PATH,
+    ULTRALYTICS_AVAILABLE, ULTRALYTICS_IMPORT_ERROR, MODEL_PATH, MODEL_TRAINING_STATS,
 )
 from core.pdf_report import generate_pdf_report
 
@@ -97,7 +97,12 @@ patient_info = {
 render_page_header(
     "Diagnostic Workspace",
     "Unggah citra sediaan dahak mikroskopis untuk deteksi otomatis Basil Tahan Asam (BTA) menggunakan YOLOv8.",
-    badges=["⚙️ Model: YOLOv8", "🔬 Mode: Klinis", "🔒 Privasi: Data Anonim"],
+    badges=[
+        "⚙️ Model: YOLOv8",
+        "🔬 Mode: Klinis",
+        "🔒 Privasi: Data Anonim",
+        f"🧠 Dilatih dari {MODEL_TRAINING_STATS['total_images']:,} citra / {MODEL_TRAINING_STATS['total_bounding_boxes']:,} bounding box".replace(",", "."),
+    ],
 )
 
 model = load_model(MODEL_PATH)
@@ -219,6 +224,37 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             """,
             unsafe_allow_html=True,
         )
+
+        # ---- Fitur Rekomendasi Medis Pintar: muncul OTOMATIS begitu status
+        # terkonfirmasi positif/scanty, langsung tampak tanpa perlu pindah tab ----
+        if category != "negative":
+            urgency_color = referral["urgency_color"]
+            st.markdown(
+                f"""
+                <div class="card" style="margin-bottom:14px; border-left:4px solid #0ea5e9;">
+                    <div class="card-title">🩺 Rekomendasi Medis Pintar (Otomatis)</div>
+                    <div class="card-subtitle">
+                        Urgensi: <span class="zone-badge {urgency_color}">{referral['urgency']}</span>
+                        &nbsp;|&nbsp; Tujuan Rujukan: <b>{referral['specialist_filter']}</b>
+                    </div>
+                    <div style="font-size:13px;color:#334155;">
+                        {"<br>".join(f"• {a}" for a in referral["actions"][:2])}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            cta1, cta2 = st.columns(2)
+            with cta1:
+                if st.button("📞 Jadwalkan Konsultasi / Lihat Rujukan Terdekat", use_container_width=True, key="cta_consult"):
+                    st.session_state["referral_filter_category"] = category
+                    safe_switch_page(
+                        "pages/3_Smart_Referral_Map.py",
+                        fallback_message="Buka halaman 'Rujukan Cerdas & Peta RS' lewat menu navigasi di sidebar sebelah kiri atas.",
+                    )
+            with cta2:
+                st.caption("Lihat detail lengkap rekomendasi di tab **🚑 Rekomendasi Rujukan**.")
+
         st.markdown("##### Visualisasi Confidence Score Model AI")
         render_progress_bar("Rata-rata Confidence Score Deteksi", avg_conf)
 
@@ -256,7 +292,40 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             st.markdown(f"- {action}")
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.info("💡 Buka halaman **Rujukan Cerdas & Peta RS** di menu sidebar untuk melihat fasilitas & dokter terdekat sesuai kategori hasil ini.")
+
+        # ---- Fitur "Hubungi Dokter Spesialis" satu klik: mengarah ke kontak
+        # RESMI fasilitas rujukan pertama yang cocok kategori (bukan nomor
+        # pribadi dokter karangan) ----
+        try:
+            from app_data.hospitals import filter_facilities_by_category
+            matching_facilities = filter_facilities_by_category(category)
+        except Exception:
+            matching_facilities = []
+
+        st.markdown("##### 📞 Hubungi Fasilitas Spesialis / Jadwalkan Konsultasi (1 Klik)")
+        if matching_facilities:
+            nearest = matching_facilities[0]
+            phone = nearest.get("phone")
+            if phone:
+                st.link_button(
+                    f"📞 Hubungi {nearest['name']} ({nearest['type']})",
+                    url=f"tel:{phone}",
+                    use_container_width=True,
+                )
+                st.caption(f"📍 {nearest['address']} • 🕒 {nearest['hours']}")
+            else:
+                st.info(f"Fasilitas terdekat: **{nearest['name']}** — nomor kontak belum tersedia di direktori, silakan cari kontak resminya secara mandiri.")
+        else:
+            st.info("Belum ada fasilitas dalam direktori yang cocok dengan kategori ini.")
+
+        st.caption(
+            "ℹ️ Saat ini tombol ini menghubungkan Anda ke jalur telepon resmi fasilitas mitra. "
+            "Fitur teleconsultation video-call langsung sedang dalam tahap pengembangan kerja sama "
+            "dengan dokter spesialis paru mitra."
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.info("💡 Buka halaman **Rujukan Cerdas & Peta RS** di menu sidebar untuk melihat seluruh fasilitas & rute terdekat sesuai kategori hasil ini.")
         if st.button("🗺️ Lihat Peta Rujukan Sesuai Hasil Ini", use_container_width=True):
             st.session_state["referral_filter_category"] = category
             safe_switch_page(
