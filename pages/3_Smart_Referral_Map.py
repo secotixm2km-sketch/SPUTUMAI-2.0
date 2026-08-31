@@ -72,10 +72,14 @@ with st.sidebar:
       status.innerText = "Meminta izin lokasi...";
       navigator.geolocation.getCurrentPosition(function(pos) {
         status.innerText = "Lokasi ditemukan, memuat ulang halaman...";
-        const url = new URL(window.top.location.href);
-        url.searchParams.set("lat", pos.coords.latitude);
-        url.searchParams.set("lon", pos.coords.longitude);
-        window.top.location.href = url.toString();
+        try {
+          const url = new URL(window.parent.location.href);
+          url.searchParams.set("lat", pos.coords.latitude);
+          url.searchParams.set("lon", pos.coords.longitude);
+          window.parent.location.href = url.toString();
+        } catch (e) {
+          status.innerText = "Browser/jaringan memblokir pembaruan otomatis. Silakan pilih kota secara manual di bawah.";
+        }
       }, function(err) {
         status.innerText = "Gagal mengambil lokasi: " + err.message;
       });
