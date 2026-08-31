@@ -32,7 +32,17 @@ def load_model(path: str = MODEL_PATH):
 
 
 def run_inference(model, image: Image.Image):
-    """Menjalankan prediksi YOLOv8 dan mengembalikan (annotated_image, count, avg_conf, confidences)."""
+    """
+    Menjalankan prediksi YOLOv8 dan mengembalikan (annotated_image, count, avg_conf, confidences).
+
+    Bounding box digambar manual (bukan pakai result.plot() bawaan Ultralytics)
+    supaya warnanya PASTI BIRU dan setiap kotak menampilkan confidence score
+    individual (mis. "TB 0.72") — sesuai skrip presentasi yang menyebutkan
+    "bounding box berwarna biru" dan "confidence score seperti 0.72 atau 0.65"
+    pada tiap deteksi, bukan cuma rata-rata keseluruhan.
+    """
+    from PIL import ImageDraw, ImageFont
+
     results = model.predict(source=image, conf=0.1, imgsz=640, verbose=False)
     result = results[0]
     boxes = result.boxes
@@ -43,9 +53,39 @@ def run_inference(model, image: Image.Image):
         confidences = [float(c) for c in boxes.conf.tolist()]
     avg_conf = (sum(confidences) / len(confidences) * 100) if confidences else 0.0
 
-    annotated_array = result.plot()
-    annotated_image = Image.fromarray(annotated_array[:, :, ::-1])
+    annotated_image = image.convert("RGB").copy()
+    draw = ImageDraw.Draw(annotated_image)
+
+    BOX_COLOR = (37, 99, 235)  # biru — konsisten dengan narasi "bounding box biru"
+    TEXT_BG = (37, 99, 235)
+    TEXT_COLOR = (255, 255, 255)
+
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
+    except Exception:
+        font = ImageFont.load_default()
+
+    if boxes is not None and count > 0:
+        xyxy = boxes.xyxy.tolist()
+        for (x1, y1, x2, y2), conf in zip(xyxy, confidences):
+            draw.rectangle([x1, y1, x2, y2], outline=BOX_COLOR, width=3)
+            label = f"TB {conf:.2f}"
+            text_bbox = draw.textbbox((0, 0), label, font=font)
+            text_w = text_bbox[2] - text_bbox[0]
+            text_h = text_bbox[3] - text_bbox[1]
+            label_y = max(0, y1 - text_h - 6)
+            draw.rectangle([x1, label_y, x1 + text_w + 8, label_y + text_h + 6], fill=TEXT_BG)
+            draw.text((x1 + 4, label_y + 2), label, fill=TEXT_COLOR, font=font)
+
     return annotated_image, count, avg_conf, confidences
+
+
+# Statistik dataset training model (sesuai data yang disampaikan tim SPUTUM-AI
+# pada skrip presentasi) — ditampilkan di UI sebagai info kredibilitas model.
+MODEL_TRAINING_STATS = {
+    "total_images": 1438,
+    "total_bounding_boxes": 11447,
+}
 
 
 def get_diagnosis_class(count: int):
