@@ -142,7 +142,8 @@ def generate_pdf_report(patient_info: dict, result_image: Image.Image, count: in
     pdf.set_font("Helvetica", "", 10)
     pdf.ln(1)
     for action in referral["actions"]:
-        pdf.multi_cell(0, 5.5, f"- {action}")
+        effective_width = pdf.w - pdf.l_margin - pdf.r_margin
+        pdf.multi_cell(effective_width, 5.5, f"- {action}")
     pdf.ln(6)
 
     pdf.set_font("Helvetica", "I", 8.5)
