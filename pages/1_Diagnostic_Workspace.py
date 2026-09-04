@@ -297,7 +297,10 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
         with m3:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{category.upper()}</div><div class="stat-label">Kategori Sementara</div></div>', unsafe_allow_html=True)
 
-    # 1. Tentukan status biner (Hanya Positif / Negatif)
+    # Ambil jumlah BTA secara aman dari session state (atau default 0 jika belum ada hasil scan)
+    total_bta = st.session_state.get('total_bta', 0)
+
+    # Tentukan status biner (Hanya Positif / Negatif)
     if total_bta > 0:
         category = "positive"
         css_class = "positive"
@@ -310,7 +313,6 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
         description = "Tidak ditemukan Basil Tahan Asam. Sampel bersih dari indikasi awal infeksi TBC."
 
     with tab_report:
-        # Kamus warna disederhanakan (tanpa 'scanty')
         box_bg = {"negative": "#f0fdf4", "positive": "#fef2f2"}[css_class]
         box_border = {"negative": "#22c55e", "positive": "#ef4444"}[css_class]
         title_color = {"negative": "#15803d", "positive": "#b91c1c"}[css_class]
