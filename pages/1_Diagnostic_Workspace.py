@@ -328,7 +328,6 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
         # Fitur Rekomendasi Medis Pintar: muncul otomatis jika positif
         if category != "negative":
             urgency_color = referral["urgency_color"]
-            # ... (lanjutkan kode rekomendasi medismu di sini)
             st.markdown(
                 f"""
                 <div class="card" style="margin-bottom:14px; border-left:4px solid #0ea5e9;">
