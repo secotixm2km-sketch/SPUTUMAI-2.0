@@ -294,10 +294,11 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{count}</div><div class="stat-label">Total BTA Terdeteksi</div></div>', unsafe_allow_html=True)
         with m2:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{avg_conf:.1f}%</div><div class="stat-label">Rata-rata Confidence</div></div>', unsafe_allow_html=True)
-# Ambil jumlah BTA secara aman dari session state
-            total_bta = st.session_state.get('total_bta', 0)
 
-    # Logika biner: > 0 adalah Positif, 0 adalah Negatif
+    # Pastikan dibaca sebagai angka bulat (integer) secara aman
+        total_bta = int(st.session_state.get('total_bta', 0))
+
+    # Logika biner yang pasti
         if total_bta > 0:
             category = "Positif"
             css_class = "positive"
