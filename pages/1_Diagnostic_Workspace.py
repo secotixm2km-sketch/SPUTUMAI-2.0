@@ -329,12 +329,26 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
         css_class = "negative"
         label = "NEGATIF (Tidak Terdeteksi)"
         description = "Tidak ditemukan Basil Tahan Asam. Sampel bersih dari indikasi awal infeksi TBC."
+# 1. Pastikan logika ini ada tepat di atas atau di dalam bagian tab_report
+    nilai_bta = int(count) if 'count' in locals() else 0
 
+    if nilai_bta > 0:
+        css_class = "positive"
+        label = "POSITIF TBC (BTA Terdeteksi)"
+        description = "Ditemukan Basil Tahan Asam pada sampel. Direkomendasikan rujukan dan penanganan medis lanjutan."
+    else:
+        css_class = "negative"
+        label = "NEGATIF (Tidak Terdeteksi)"
+        description = "Tidak ditemukan Basil Tahan Asam. Sampel bersih dari indikasi awal infeksi TBC."
+
+    # 2. Render isi Laporan Klinis
     with tab_report:
+        # Menentukan warna kotak alert
         box_bg = {"negative": "#f0fdf4", "positive": "#fef2f2"}[css_class]
         box_border = {"negative": "#22c55e", "positive": "#ef4444"}[css_class]
         title_color = {"negative": "#15803d", "positive": "#b91c1c"}[css_class]
         
+        # Cetak Kotak Alert Positif/Negatif
         st.markdown(
             f"""
             <div style="border-radius:14px;padding:22px 24px;margin-bottom:18px;border-left:6px solid {box_border};background:{box_bg};">
@@ -344,6 +358,26 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             """,
             unsafe_allow_html=True,
         )
+
+        # Cetak Bar Merah-Kuning (Ganti st.progress yang lama)
+        score_val = float(avg_conf) if 'avg_conf' in locals() else 0.0
+        progress_html = f"""
+        <div style="margin: 25px 0 25px 0;">
+            <div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
+                Visualisasi Confidence Score Model AI
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #475569;">
+                <span>Rata-rata Confidence Score Deteksi</span>
+                <span>{score_val:.1f}%</span>
+            </div>
+            <div style="background-color: #fef08a; width: 100%; height: 16px; border-radius: 8px; overflow: hidden; border: 1px solid #fde047;">
+                <div style="background-color: #ef4444; width: {score_val}%; height: 100%; border-radius: 8px 0 0 8px;"></div>
+            </div>
+        </div>
+        """
+        st.markdown(progress_html, unsafe_allow_html=True)
+        
+        # (Lanjutkan dengan kode Ringkasan Data Pemeriksaan dan Rujukan di bawahnya...)
 
         # Fitur Rekomendasi Medis Pintar: muncul otomatis jika positif
         if category != "negative":
