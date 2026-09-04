@@ -294,16 +294,22 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{count}</div><div class="stat-label">Total BTA Terdeteksi</div></div>', unsafe_allow_html=True)
         with m2:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{avg_conf:.1f}%</div><div class="stat-label">Rata-rata Confidence</div></div>', unsafe_allow_html=True)
-       # 1. Ambil data jumlah BTA secara aman
-        total_bta = st.session_state.get('total_bta', 0)
+# Ambil jumlah BTA secara aman dari session state
+            total_bta = st.session_state.get('total_bta', 0)
 
-    # 2. Tentukan kategori murni biner (Hanya positif / negatif)
+    # Logika biner: > 0 adalah Positif, 0 adalah Negatif
         if total_bta > 0:
             category = "Positif"
+            css_class = "positive"
+            label = "POSITIF TBC (BTA Terdeteksi)"
+            description = "Ditemukan Basil Tahan Asam pada sampel. Direkomendasikan rujukan dan penanganan medis lanjutan."
         else:
             category = "Negatif"
+            css_class = "negative"
+            label = "NEGATIF (Tidak Terdeteksi)"
+            description = "Tidak ditemukan Basil Tahan Asam. Sampel bersih dari indikasi awal infeksi TBC."
 
-    # 3. Baru cetak ke kartu m3
+    # Cetak ke kartu kategori sementara (m3)
         with m3:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{category.upper()}</div><div class="stat-label">Kategori Sementara</div></div>', unsafe_allow_html=True)
         
