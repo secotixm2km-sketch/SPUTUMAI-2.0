@@ -408,8 +408,8 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             with cta2:
                 st.caption("Lihat detail lengkap rekomendasi di tab **🚑 Rekomendasi Rujukan**.")
 
-        st.markdown("##### Visualisasi Confidence Score Model AI")
-        render_progress_bar("Rata-rata Confidence Score Deteksi", avg_conf)
+        # st.markdown("##### Visualisasi Confidence Score Model AI")
+        # render_progress_bar("Rata-rata Confidence Score Deteksi", avg_conf)
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("##### Ringkasan Data Pemeriksaan (Anonim)")
