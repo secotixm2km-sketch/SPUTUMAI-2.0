@@ -37,6 +37,27 @@ def init_state():
 
 def render_progress_bar(label: str, percentage: float):
     percentage = max(0, min(100, percentage))
+
+    st.markdown("""
+<style>
+    /* Memastikan elemen card tidak melebihi layar HP */
+    .card, .stat-card {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-wrap: break-word !important;
+    }
+    
+    /* Mengurangi padding di layar kecil agar tidak sesak */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-top: 2rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
+    
     st.markdown(
         f"""
         <div class="progress-wrap">
