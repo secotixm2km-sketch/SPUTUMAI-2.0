@@ -297,6 +297,24 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
         with m3:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{category.upper()}</div><div class="stat-label">Kategori Sementara</div></div>', unsafe_allow_html=True)
 
+        # Masukkan kode ini di bawah m2 (atau di tempat bar lama berada)
+    score_val = float(avg_conf) 
+
+    progress_html = f"""
+    <div style="margin: 15px 0 20px 0;">
+        <div style="font-size: 13.5px; font-weight: 600; color: #1e293b; margin-bottom: 6px;">
+            Visualisasi Confidence Score Deteksi
+        </div>
+        <!-- Kotak Sisa / Background (Warna Kuning) -->
+        <div style="background-color: #fef08a; width: 100%; height: 18px; border-radius: 9px; overflow: hidden; border: 1px solid #fde047;">
+            <!-- Bar Utama (Warna Merah sesuai besar persentase nilai confidence) -->
+            <div style="background-color: #ef4444; width: {score_val}%; height: 100%; border-radius: 8px 0 0 8px;"></div>
+        </div>
+    </div>
+    """
+
+    st.markdown(progress_html, unsafe_allow_html=True)
+        
     # Ambil jumlah BTA secara aman dari session state (atau default 0 jika belum ada hasil scan)
     total_bta = st.session_state.get('total_bta', 0)
 
