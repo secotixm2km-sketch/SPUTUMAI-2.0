@@ -55,6 +55,43 @@ def render_progress_bar(label: str, percentage: float):
             padding-right: 1rem !important;
         }
     }
+
+    /* ==========================================
+       PERBAIKAN WARNA KOTAK INPUT & UPLOADER 
+       ========================================== */
+    
+    /* 1. Ubah background kotak input (teks, angka, dropdown) jadi putih solid */
+    div[data-baseweb="input"] > div,
+    div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important; /* Border abu-abu tipis biar elegan */
+    }
+
+    /* 2. Ubah warna teks yang diketik pengguna jadi gelap/jelas */
+    div[data-baseweb="input"] input,
+    div[data-baseweb="select"] div {
+        color: #1e293b !important; /* Warna teks gelap */
+        -webkit-text-fill-color: #1e293b !important;
+    }
+
+    /* 3. Teks Placeholder (Contoh: ...) dibuat samar-samar/abu-abu */
+    input::placeholder {
+        color: #94a3b8 !important;
+        -webkit-text-fill-color: #94a3b8 !important;
+        opacity: 1 !important;
+    }
+
+    /* 4. Perbaiki area Drag & Drop File Uploader jadi putih */
+    [data-testid="stFileUploadDropzone"] {
+        background-color: #ffffff !important;
+        border: 2px dashed #94a3b8 !important; /* Garis putus-putus */
+    }
+
+    /* 5. Ubah teks di dalam area Drag & Drop agar terbaca */
+    [data-testid="stFileUploadDropzone"] div {
+        color: #475569 !important;
+    }
+    
 </style>
 """, unsafe_allow_html=True)
     
