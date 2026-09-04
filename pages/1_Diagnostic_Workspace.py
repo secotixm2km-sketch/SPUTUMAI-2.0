@@ -294,6 +294,16 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{count}</div><div class="stat-label">Total BTA Terdeteksi</div></div>', unsafe_allow_html=True)
         with m2:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{avg_conf:.1f}%</div><div class="stat-label">Rata-rata Confidence</div></div>', unsafe_allow_html=True)
+       # 1. Ambil data jumlah BTA secara aman
+        total_bta = st.session_state.get('total_bta', 0)
+
+    # 2. Tentukan kategori murni biner (Hanya positif / negatif)
+        if total_bta > 0:
+            category = "Positif"
+        else:
+            category = "Negatif"
+
+    # 3. Baru cetak ke kartu m3
         with m3:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{category.upper()}</div><div class="stat-label">Kategori Sementara</div></div>', unsafe_allow_html=True)
         
