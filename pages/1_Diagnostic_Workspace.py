@@ -297,10 +297,24 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
         with m3:
             st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{category.upper()}</div><div class="stat-label">Kategori Sementara</div></div>', unsafe_allow_html=True)
 
+    # 1. Tentukan status biner (Hanya Positif / Negatif)
+    if total_bta > 0:
+        category = "positive"
+        css_class = "positive"
+        label = "POSITIF TBC (BTA Terdeteksi)"
+        description = "Ditemukan Basil Tahan Asam pada sampel. Direkomendasikan rujukan dan penanganan medis lanjutan."
+    else:
+        category = "negative"
+        css_class = "negative"
+        label = "NEGATIF (Tidak Terdeteksi)"
+        description = "Tidak ditemukan Basil Tahan Asam. Sampel bersih dari indikasi awal infeksi TBC."
+
     with tab_report:
-        box_bg = {"negative": "#f0fdf4", "scanty": "#fffbeb", "positive": "#fef2f2"}[css_class]
-        box_border = {"negative": "#22c55e", "scanty": "#f59e0b", "positive": "#ef4444"}[css_class]
-        title_color = {"negative": "#15803d", "scanty": "#b45309", "positive": "#b91c1c"}[css_class]
+        # Kamus warna disederhanakan (tanpa 'scanty')
+        box_bg = {"negative": "#f0fdf4", "positive": "#fef2f2"}[css_class]
+        box_border = {"negative": "#22c55e", "positive": "#ef4444"}[css_class]
+        title_color = {"negative": "#15803d", "positive": "#b91c1c"}[css_class]
+        
         st.markdown(
             f"""
             <div style="border-radius:14px;padding:22px 24px;margin-bottom:18px;border-left:6px solid {box_border};background:{box_bg};">
@@ -311,10 +325,10 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             unsafe_allow_html=True,
         )
 
-        # ---- Fitur Rekomendasi Medis Pintar: muncul OTOMATIS begitu status
-        # terkonfirmasi positif/scanty, langsung tampak tanpa perlu pindah tab ----
+        # Fitur Rekomendasi Medis Pintar: muncul otomatis jika positif
         if category != "negative":
             urgency_color = referral["urgency_color"]
+            # ... (lanjutkan kode rekomendasi medismu di sini)
             st.markdown(
                 f"""
                 <div class="card" style="margin-bottom:14px; border-left:4px solid #0ea5e9;">
