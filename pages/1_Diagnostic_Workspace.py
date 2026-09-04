@@ -289,17 +289,12 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             st.caption("Hasil Deteksi AI (Annotated)")
 
         st.markdown("<br>", unsafe_allow_html=True)
-        m1, m2, m3 = st.columns(3)
-        with m1:
-            st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{count}</div><div class="stat-label">Total BTA Terdeteksi</div></div>', unsafe_allow_html=True)
-        with m2:
-            st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{avg_conf:.1f}%</div><div class="stat-label">Rata-rata Confidence</div></div>', unsafe_allow_html=True)
 
-    # Pastikan dibaca sebagai angka bulat (integer) secara aman
-        total_bta = int(st.session_state.get('total_bta', 0))
+        # 1. Pastikan nilai count diubah jadi angka bulat
+        nilai_bta = int(count) if 'count' in locals() else 0
 
-    # Logika biner yang pasti
-        if total_bta > 0:
+    # 2. Tentukan status biner berdasarkan nilai_bta (count)
+        if nilai_bta > 0:
             category = "Positif"
             css_class = "positive"
             label = "POSITIF TBC (BTA Terdeteksi)"
@@ -309,6 +304,12 @@ if st.session_state.scan_done and st.session_state.result_image is not None:
             css_class = "negative"
             label = "NEGATIF (Tidak Terdeteksi)"
             description = "Tidak ditemukan Basil Tahan Asam. Sampel bersih dari indikasi awal infeksi TBC."
+        
+        m1, m2, m3 = st.columns(3)
+        with m1:
+            st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{count}</div><div class="stat-label">Total BTA Terdeteksi</div></div>', unsafe_allow_html=True)
+        with m2:
+            st.markdown(f'<div class="stat-card accent-blue"><div class="stat-value">{avg_conf:.1f}%</div><div class="stat-label">Rata-rata Confidence</div></div>', unsafe_allow_html=True)
 
     # Cetak ke kartu kategori sementara (m3)
         with m3:
